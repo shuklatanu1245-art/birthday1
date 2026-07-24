@@ -55,10 +55,12 @@ export default function AdminDashboard() {
       if (result.url) {
         setFormData({ ...formData, friendPhoto: result.url });
         alert("Profile photo uploaded!");
+      } else {
+        alert("Upload failed: " + (result.error || "Unknown error"));
       }
     } catch (error) {
       console.error("Error uploading profile photo:", error);
-      alert("Error uploading profile photo.");
+      alert("Error uploading profile photo. Check console.");
     }
     setUploadingProfile(false);
   };
@@ -112,11 +114,11 @@ export default function AdminDashboard() {
         alert("Image uploaded and added to gallery!");
         fetchSurprises();
       } else {
-        alert("Upload failed.");
+        alert("Upload failed: " + (result.error || "Unknown error"));
       }
     } catch (error) {
       console.error("Error uploading image:", error);
-      alert("Error uploading image.");
+      alert("Error uploading image. Check console.");
     }
     setUploadingImageId(null);
   };

@@ -33,7 +33,7 @@ export async function POST(req) {
 
     return NextResponse.json({ url: result.secure_url });
   } catch (error) {
-    console.error("Upload error:", error);
-    return NextResponse.json({ error: "Upload failed" }, { status: 500 });
+    console.error("Upload error details:", error);
+    return NextResponse.json({ error: error.message || "Upload failed. Check Cloud Name." }, { status: 500 });
   }
 }
