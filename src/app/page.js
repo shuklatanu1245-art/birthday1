@@ -1,65 +1,97 @@
-import Image from "next/image";
+"use client";
+import { useState, useRef } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import confetti from "canvas-confetti";
 
 export default function Home() {
+  const [isOpen, setIsOpen] = useState(false);
+  const containerRef = useRef(null);
+
+  const handleOpen = () => {
+    // Trigger confetti
+    var duration = 3000;
+    var end = Date.now() + duration;
+
+    (function frame() {
+      confetti({
+        particleCount: 5,
+        angle: 60,
+        spread: 55,
+        origin: { x: 0 },
+        colors: ['#D12260', '#F4D03F', '#ffffff']
+      });
+      confetti({
+        particleCount: 5,
+        angle: 120,
+        spread: 55,
+        origin: { x: 1 },
+        colors: ['#D12260', '#F4D03F', '#ffffff']
+      });
+
+      if (Date.now() < end) {
+        requestAnimationFrame(frame);
+      }
+    }());
+
+    setIsOpen(true);
+    // Ideally, we'd navigate to the main dashboard/surprise page here after a delay
+    // setTimeout(() => router.push('/surprise'), 2000);
+  };
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.js file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+    <main 
+      ref={containerRef}
+      className="relative min-h-screen flex flex-col items-center justify-center aurora-bg overflow-hidden"
+    >
+      {/* Background Floating Elements could be added here using Framer Motion or Particles.js */}
+      
+      <AnimatePresence>
+        {!isOpen && (
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 1.5, filter: "blur(10px)" }}
+            transition={{ duration: 1.2, ease: "easeInOut" }}
+            className="z-10 flex flex-col items-center text-center space-y-6"
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+            <h1 className="text-6xl md:text-8xl font-serif text-glow bg-clip-text text-transparent bg-gradient-to-r from-gold-accent to-white">
+              Happy Birthday
+            </h1>
+            
+            <h2 className="text-4xl md:text-6xl font-bold tracking-widest text-white mt-4">
+              Best Friend
+            </h2>
+            
+            <p className="text-xl md:text-2xl text-royal-pink italic mt-4 shadow-black drop-shadow-md">
+              "A Special Surprise Awaits You ❤️"
+            </p>
+            
+            <motion.button 
+              whileHover={{ scale: 1.05, boxShadow: "0px 0px 20px rgba(244, 208, 63, 0.6)" }}
+              whileTap={{ scale: 0.95 }}
+              onClick={handleOpen}
+              className="mt-12 px-8 py-4 bg-glass-bg border border-gold-accent/50 rounded-full text-gold-accent text-xl tracking-wide font-medium backdrop-blur-md hover:bg-gold-accent hover:text-midnight-blue transition-all duration-300"
+            >
+              Open Your Surprise
+            </motion.button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* When Opened: The Main Content */}
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 1, duration: 1 }}
+            className="absolute inset-0 flex flex-col items-center justify-center bg-midnight-blue/90 z-20"
           >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+            <h2 className="text-5xl text-glow text-white">Welcome to your premium gift!</h2>
+            <p className="text-lg text-gray-300 mt-4">(Navigation and other sections will be here)</p>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </main>
   );
 }
