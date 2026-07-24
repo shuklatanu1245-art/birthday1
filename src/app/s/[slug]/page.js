@@ -39,7 +39,15 @@ export default function SurprisePage() {
 
   const getThemeConfig = () => {
     if (!data) return {};
-    if (data.relationType === "Girlfriend" || data.relationType === "Boyfriend" || data.celebrationType === "Romantic") {
+    if (data.celebrationType === "Grand") {
+      return {
+        colors: ['#FFD700', '#C0C0C0', '#ffffff'],
+        bgClass: "bg-gradient-to-br from-[#000000] via-[#1a1a1a] to-[#434343]", // Royal Black & Silver
+        audioSrc: "https://cdn.pixabay.com/download/audio/2022/01/18/audio_d0a13f69d2.mp3?filename=epic-cinematic-trailer-113904.mp3", // Cinematic Epic
+        emoji: "👑",
+        titleGlow: "from-[#FFD700] via-white to-[#FFD700]"
+      };
+    } else if (data.relationType === "Girlfriend" || data.relationType === "Boyfriend" || data.celebrationType === "Romantic") {
       return {
         colors: ['#ff0a54', '#ff477e', '#ff7096'],
         bgClass: "bg-gradient-to-br from-[#2a0845] to-[#6441A5]", 
