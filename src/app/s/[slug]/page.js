@@ -138,9 +138,14 @@ export default function SurprisePage() {
               <div className="text-lg text-gray-200 leading-relaxed whitespace-pre-wrap font-sans text-left w-full">
                 {data.letterContent}
               </div>
-              <p className="mt-8 text-royal-pink italic text-xl font-serif text-right w-full">
-                With lots of love, <br/> Your {data.relationType === "Girlfriend" ? "Boyfriend" : "Friend"}
-              </p>
+              <div className="mt-8 text-royal-pink italic font-serif text-right w-full">
+                <p className="text-xl">With lots of love,</p>
+                {data.senderName ? (
+                  <p className="text-2xl font-bold">{data.senderName}</p>
+                ) : (
+                  <p className="text-xl">Your {data.relationType === "Girlfriend" ? "Boyfriend" : "Friend"}</p>
+                )}
+              </div>
             </div>
             
             {/* Gallery Section */}

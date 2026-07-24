@@ -6,6 +6,7 @@ export default function AdminDashboard() {
   const [formData, setFormData] = useState({
     slug: "",
     name: "",
+    senderName: "",
     relationType: "Friend",
     celebrationType: "Party",
     letterContent: "",
@@ -94,7 +95,7 @@ export default function AdminDashboard() {
         localStorage.setItem("localSurprises", JSON.stringify(updatedSurprises));
 
         alert("Surprise created successfully!");
-        setFormData({ slug: "", name: "", relationType: "Friend", celebrationType: "Party", letterContent: "", friendPhoto: "", gallery: [] });
+        setFormData({ slug: "", name: "", senderName: "", relationType: "Friend", celebrationType: "Party", letterContent: "", friendPhoto: "", gallery: [] });
       } else {
         alert("Error saving data: " + result.error);
       }
@@ -175,11 +176,23 @@ export default function AdminDashboard() {
             </div>
             
             <div>
-              <label className="block text-sm mb-1">Friend Name</label>
+              <label className="block text-sm mb-1">Friend Name (Kisko Wish Karna Hai)</label>
               <input 
                 type="text" 
                 name="name" 
                 value={formData.name} 
+                onChange={handleChange} 
+                required 
+                className="w-full bg-white/10 border border-white/20 rounded p-2 text-white" 
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm mb-1">Sender Name (Kis-ki Taraf Se Hai)</label>
+              <input 
+                type="text" 
+                name="senderName" 
+                value={formData.senderName} 
                 onChange={handleChange} 
                 required 
                 className="w-full bg-white/10 border border-white/20 rounded p-2 text-white" 
