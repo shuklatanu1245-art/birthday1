@@ -9,11 +9,14 @@ export default function AdminDashboard() {
     slug: "",
     name: "",
     relationType: "Friend",
+    celebrationType: "Party",
     letterContent: "",
+    friendPhoto: "",
     gallery: []
   });
   const [loading, setLoading] = useState(false);
   const [uploadingImageId, setUploadingImageId] = useState(null);
+  const [uploadingProfile, setUploadingProfile] = useState(false);
 
   useEffect(() => {
     fetchSurprises();
@@ -33,8 +36,39 @@ export default function AdminDashboard() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  const handleProfilePhotoUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    setUploadingProfile(true);
+    
+    const uploadData = new FormData();
+    uploadData.append("file", file);
+    uploadData.append("slug", formData.slug || "profiles");
+
+    try {
+      const res = await fetch("/api/upload", {
+        method: "POST",
+        body: uploadData,
+      });
+      const result = await res.json();
+      if (result.url) {
+        setFormData({ ...formData, friendPhoto: result.url });
+        alert("Profile photo uploaded!");
+      }
+    } catch (error) {
+      console.error("Error uploading profile photo:", error);
+      alert("Error uploading profile photo.");
+    }
+    setUploadingProfile(false);
+  };
+
   const handleCreateSurprise = async (e) => {
     e.preventDefault();
+    if (!formData.friendPhoto) {
+      alert("Please upload a friend photo first!");
+      return;
+    }
     setLoading(true);
     try {
       await addDoc(collection(db, "surprises"), {
@@ -43,7 +77,7 @@ export default function AdminDashboard() {
         createdAt: new Date().toISOString()
       });
       alert("Surprise created successfully!");
-      setFormData({ slug: "", name: "", relationType: "Friend", letterContent: "", gallery: [] });
+      setFormData({ slug: "", name: "", relationType: "Friend", celebrationType: "Party", letterContent: "", friendPhoto: "", gallery: [] });
       fetchSurprises();
     } catch (error) {
       console.error("Error adding document: ", error);
@@ -58,21 +92,19 @@ export default function AdminDashboard() {
 
     setUploadingImageId(surpriseId);
     
-    const formData = new FormData();
-    formData.append("file", file);
-    formData.append("slug", slug);
+    const uploadData = new FormData();
+    uploadData.append("file", file);
+    uploadData.append("slug", slug);
 
     try {
-      // Upload to Cloudinary via our API route
       const res = await fetch("/api/upload", {
         method: "POST",
-        body: formData,
+        body: uploadData,
       });
       
       const result = await res.json();
       
       if (result.url) {
-        // Update Firestore document with new image URL
         const surpriseRef = doc(db, "surprises", surpriseId);
         await updateDoc(surpriseRef, {
           gallery: arrayUnion(result.url)
@@ -111,7 +143,7 @@ export default function AdminDashboard() {
             </div>
             
             <div>
-              <label className="block text-sm mb-1">Full Name</label>
+              <label className="block text-sm mb-1">Friend Name</label>
               <input 
                 type="text" 
                 name="name" 
@@ -123,18 +155,49 @@ export default function AdminDashboard() {
             </div>
 
             <div>
-              <label className="block text-sm mb-1">Relation Type</label>
-              <select 
-                name="relationType" 
-                value={formData.relationType} 
-                onChange={handleChange} 
-                className="w-full bg-midnight-blue border border-white/20 rounded p-2 text-white"
-              >
-                <option value="Friend">Friend</option>
-                <option value="Girlfriend">Girlfriend</option>
-                <option value="Boyfriend">Boyfriend</option>
-                <option value="Family">Family</option>
-              </select>
+              <label className="block text-sm mb-1">Friend Photo (Cloudinary)</label>
+              <input 
+                type="file" 
+                accept="image/*"
+                onChange={handleProfilePhotoUpload} 
+                disabled={uploadingProfile || !formData.slug}
+                className="w-full bg-white/10 border border-white/20 rounded p-2 text-white text-sm" 
+              />
+              {!formData.slug && <p className="text-xs text-royal-pink mt-1">Please enter slug first to upload photo.</p>}
+              {uploadingProfile && <p className="text-xs text-gold-accent mt-1 animate-pulse">Uploading...</p>}
+              {formData.friendPhoto && <p className="text-xs text-green-400 mt-1">Photo uploaded successfully!</p>}
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm mb-1">Category (Relation)</label>
+                <select 
+                  name="relationType" 
+                  value={formData.relationType} 
+                  onChange={handleChange} 
+                  className="w-full bg-midnight-blue border border-white/20 rounded p-2 text-white"
+                >
+                  <option value="Friend">Friend</option>
+                  <option value="Girlfriend">Girlfriend</option>
+                  <option value="Boyfriend">Boyfriend</option>
+                  <option value="Family">Family</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm mb-1">Celebration Type</label>
+                <select 
+                  name="celebrationType" 
+                  value={formData.celebrationType} 
+                  onChange={handleChange} 
+                  className="w-full bg-midnight-blue border border-white/20 rounded p-2 text-white"
+                >
+                  <option value="Party">Party</option>
+                  <option value="Romantic">Romantic</option>
+                  <option value="Grand">Grand</option>
+                  <option value="Quiet">Quiet</option>
+                </select>
+              </div>
             </div>
 
             <div>
@@ -151,7 +214,7 @@ export default function AdminDashboard() {
 
             <button 
               type="submit" 
-              disabled={loading}
+              disabled={loading || uploadingProfile}
               className="w-full bg-gold-accent text-midnight-blue font-bold py-2 rounded hover:bg-white transition"
             >
               {loading ? "Creating..." : "Generate Surprise"}
@@ -160,7 +223,7 @@ export default function AdminDashboard() {
         </div>
 
         {/* List of Generated Surprises */}
-        <div className="glassmorphism p-6">
+        <div className="glassmorphism p-6 h-fit max-h-[80vh] overflow-y-auto">
           <h2 className="text-2xl font-bold mb-4">Your Created Surprises</h2>
           {surprises.length === 0 ? (
             <p className="text-gray-400">No surprises created yet.</p>
@@ -168,10 +231,13 @@ export default function AdminDashboard() {
             <ul className="space-y-4">
               {surprises.map((s) => (
                 <li key={s.id} className="bg-white/5 p-4 rounded-lg border border-white/10 flex flex-col space-y-3">
-                  <div>
-                    <h3 className="text-xl font-bold text-royal-pink">{s.name} <span className="text-sm font-normal text-gray-400">({s.relationType})</span></h3>
-                    <p className="text-sm text-gray-300 mt-1">Link: <a href={`/s/${s.slug}`} target="_blank" className="text-gold-accent hover:underline">/s/{s.slug}</a></p>
-                    <p className="text-xs text-gray-400 mt-1">Photos in gallery: {s.gallery?.length || 0}</p>
+                  <div className="flex items-center space-x-4">
+                    {s.friendPhoto && <img src={s.friendPhoto} alt={s.name} className="w-12 h-12 rounded-full object-cover border-2 border-gold-accent" />}
+                    <div>
+                      <h3 className="text-xl font-bold text-royal-pink">{s.name} <span className="text-sm font-normal text-gray-400">({s.relationType} - {s.celebrationType})</span></h3>
+                      <p className="text-sm text-gray-300 mt-1">Link: <a href={`/s/${s.slug}`} target="_blank" className="text-gold-accent hover:underline">/s/{s.slug}</a></p>
+                      <p className="text-xs text-gray-400 mt-1">Photos in gallery: {s.gallery?.length || 0}</p>
+                    </div>
                   </div>
                   
                   <div className="border-t border-white/10 pt-3">

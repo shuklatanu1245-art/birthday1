@@ -117,12 +117,17 @@ export default function SurprisePage() {
             transition={{ delay: 0.5, duration: 1 }}
             className="absolute inset-0 flex flex-col items-center justify-center bg-midnight-blue/90 z-20 p-8 overflow-y-auto"
           >
-            <div className="glassmorphism max-w-4xl w-full p-8 text-center mt-32 md:mt-0 mb-8">
+            <div className="glassmorphism max-w-4xl w-full p-8 text-center mt-32 md:mt-0 mb-8 flex flex-col items-center">
+              {data.friendPhoto && (
+                <div className="mb-6 -mt-16">
+                  <img src={data.friendPhoto} alt={data.name} className="w-32 h-32 md:w-40 md:h-40 rounded-full object-cover border-4 border-gold-accent shadow-2xl shadow-black/50" />
+                </div>
+              )}
               <h2 className="text-4xl font-serif text-gold-accent mb-6">Dear {data.name},</h2>
-              <div className="text-lg text-gray-200 leading-relaxed whitespace-pre-wrap font-sans text-left">
+              <div className="text-lg text-gray-200 leading-relaxed whitespace-pre-wrap font-sans text-left w-full">
                 {data.letterContent}
               </div>
-              <p className="mt-8 text-royal-pink italic text-xl font-serif text-right">
+              <p className="mt-8 text-royal-pink italic text-xl font-serif text-right w-full">
                 With lots of love, <br/> Your {data.relationType === "Girlfriend" ? "Boyfriend" : "Friend"}
               </p>
             </div>
