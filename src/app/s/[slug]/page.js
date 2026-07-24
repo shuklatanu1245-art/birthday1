@@ -37,12 +37,46 @@ export default function SurprisePage() {
     if (slug) fetchSurpriseData();
   }, [slug]);
 
+  const getThemeConfig = () => {
+    if (!data) return {};
+    if (data.relationType === "Girlfriend" || data.relationType === "Boyfriend" || data.celebrationType === "Romantic") {
+      return {
+        colors: ['#ff0a54', '#ff477e', '#ff7096'],
+        bgClass: "bg-gradient-to-br from-[#2a0845] to-[#6441A5]", 
+        audioSrc: "https://cdn.pixabay.com/download/audio/2022/03/15/audio_731422b9c7.mp3?filename=romantic-piano-116534.mp3",
+        emoji: "❤️",
+        titleGlow: "from-pink-400 to-red-500"
+      };
+    } else if (data.celebrationType === "Party") {
+      return {
+        colors: ['#00f5d4', '#fee440', '#f15bb5', '#9b5de5'],
+        bgClass: "bg-gradient-to-br from-[#141E30] to-[#243B55]", 
+        audioSrc: "https://cdn.pixabay.com/download/audio/2021/08/04/audio_0625c1539c.mp3?filename=upbeat-party-electronic-dance-10900.mp3",
+        emoji: "🎉",
+        titleGlow: "from-cyan-400 to-purple-500"
+      };
+    } else { // Quiet / Family
+      return {
+        colors: ['#FFD700', '#FDF5E6', '#ffffff'],
+        bgClass: "bg-gradient-to-br from-[#0f2027] via-[#203a43] to-[#2c5364]", 
+        audioSrc: "https://cdn.pixabay.com/download/audio/2021/09/06/audio_0cbdfef2d1.mp3?filename=warm-acoustic-guitar-75304.mp3",
+        emoji: "✨",
+        titleGlow: "from-gold-accent to-white"
+      };
+    }
+  };
+
   const handleOpen = () => {
     var duration = 3000;
     var end = Date.now() + duration;
+    
+    const theme = getThemeConfig();
 
-    // Different confetti colors based on relation type
-    const colors = data?.relationType === "Girlfriend" ? ['#ff0a54', '#ff477e', '#ff7096'] : ['#D12260', '#F4D03F', '#ffffff'];
+    // Play Background Music
+    const audio = new Audio(theme.audioSrc);
+    audio.loop = true;
+    audio.volume = 0.5;
+    audio.play().catch(e => console.log("Audio autoplay blocked by browser:", e));
 
     (function frame() {
       confetti({
@@ -50,14 +84,14 @@ export default function SurprisePage() {
         angle: 60,
         spread: 55,
         origin: { x: 0 },
-        colors: colors
+        colors: theme.colors
       });
       confetti({
         particleCount: 5,
         angle: 120,
         spread: 55,
         origin: { x: 1 },
-        colors: colors
+        colors: theme.colors
       });
 
       if (Date.now() < end) {
@@ -81,12 +115,10 @@ export default function SurprisePage() {
     );
   }
 
-  // Determine theme based on relation
-  const isRomantic = data.relationType === "Girlfriend" || data.relationType === "Boyfriend";
-  const themeClass = isRomantic ? "bg-gradient-to-br from-[#23083D] to-[#D12260]" : "aurora-bg";
+  const theme = getThemeConfig();
 
   return (
-    <main className={`relative min-h-screen flex flex-col items-center justify-center overflow-hidden ${themeClass}`}>
+    <main className={`relative min-h-screen flex flex-col items-center justify-center overflow-hidden ${theme.bgClass}`}>
       <AnimatePresence>
         {!isOpen && (
           <motion.div 
@@ -96,7 +128,7 @@ export default function SurprisePage() {
             transition={{ duration: 1.2, ease: "easeInOut" }}
             className="z-10 flex flex-col items-center text-center space-y-6"
           >
-            <h1 className="text-6xl md:text-8xl font-serif text-glow bg-clip-text text-transparent bg-gradient-to-r from-gold-accent to-white">
+            <h1 className={`text-6xl md:text-8xl font-serif text-glow bg-clip-text text-transparent bg-gradient-to-r ${theme.titleGlow}`}>
               Happy Birthday
             </h1>
             
@@ -105,7 +137,7 @@ export default function SurprisePage() {
             </h2>
             
             <p className="text-xl md:text-2xl text-royal-pink italic mt-4 shadow-black drop-shadow-md">
-              "A Special Surprise Awaits You ❤️"
+              "A Special Surprise Awaits You {theme.emoji}"
             </p>
             
             <motion.button 
