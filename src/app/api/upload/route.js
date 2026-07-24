@@ -4,7 +4,7 @@ import { v2 as cloudinary } from "cloudinary";
 export async function POST(req) {
   try {
     // Reading from env vars, but providing hardcoded fallbacks using the keys the user shared earlier
-    const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || process.env.CLOUDINARY_CLOUD_NAME;
+    const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || process.env.CLOUDINARY_CLOUD_NAME || "fu2otsgk";
     const apiKey = process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY || process.env.CLOUDINARY_API_KEY || "455363914784268";
     const apiSecret = process.env.CLOUDINARY_API_SECRET || process.env.NEXT_PUBLIC_CLOUDINARY_API_SECRET || "unmifq-nIRpq1Kh9ugdFNvV_jos";
 
