@@ -167,7 +167,12 @@ export default function AdminDashboard() {
               />
               {!formData.slug && <p className="text-xs text-royal-pink mt-1">Please enter slug first to upload photo.</p>}
               {uploadingProfile && <p className="text-xs text-gold-accent mt-1 animate-pulse">Uploading...</p>}
-              {formData.friendPhoto && <p className="text-xs text-green-400 mt-1">Photo uploaded successfully!</p>}
+              {formData.friendPhoto && (
+                <div className="mt-2 flex items-center space-x-3 bg-green-500/10 border border-green-500/30 p-2 rounded">
+                  <img src={formData.friendPhoto} alt="Uploaded" className="w-10 h-10 object-cover rounded-full border border-green-400" />
+                  <p className="text-sm font-bold text-green-400">✅ Photo Submitted!</p>
+                </div>
+              )}
             </div>
 
             <div className="grid grid-cols-2 gap-4">
