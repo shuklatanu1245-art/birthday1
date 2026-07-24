@@ -117,17 +117,35 @@ export default function SurprisePage() {
             transition={{ delay: 0.5, duration: 1 }}
             className="absolute inset-0 flex flex-col items-center justify-center bg-midnight-blue/90 z-20 p-8 overflow-y-auto"
           >
-            <div className="glassmorphism max-w-2xl w-full p-8 text-center mt-32 md:mt-0">
+            <div className="glassmorphism max-w-4xl w-full p-8 text-center mt-32 md:mt-0 mb-8">
               <h2 className="text-4xl font-serif text-gold-accent mb-6">Dear {data.name},</h2>
               <div className="text-lg text-gray-200 leading-relaxed whitespace-pre-wrap font-sans text-left">
                 {data.letterContent}
               </div>
-              <p className="mt-8 text-royal-pink italic text-xl font-serif">
+              <p className="mt-8 text-royal-pink italic text-xl font-serif text-right">
                 With lots of love, <br/> Your {data.relationType === "Girlfriend" ? "Boyfriend" : "Friend"}
               </p>
             </div>
-            {/* The rest of the sections (Gallery, Video, Timeline) will be built below this */}
-            <p className="mt-12 text-gray-400 text-sm animate-pulse">Scroll down for more memories (Coming Soon)</p>
+            
+            {/* Gallery Section */}
+            {data.gallery && data.gallery.length > 0 && (
+              <div className="max-w-4xl w-full mb-16">
+                <h3 className="text-3xl font-serif text-gold-accent text-center mb-8 border-b border-white/10 pb-4">Beautiful Memories</h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                  {data.gallery.map((url, index) => (
+                    <motion.div 
+                      key={index} 
+                      whileHover={{ scale: 1.05 }}
+                      className="overflow-hidden rounded-xl shadow-lg border border-white/10 bg-white/5"
+                    >
+                      <img src={url} alt={`Memory ${index + 1}`} className="w-full h-auto object-cover hover:opacity-90 transition-opacity" />
+                    </motion.div>
+                  ))}
+                </div>
+              </div>
+            )}
+            
+            <p className="mt-8 text-gray-400 text-sm animate-pulse">More surprises coming soon!</p>
           </motion.div>
         )}
       </AnimatePresence>

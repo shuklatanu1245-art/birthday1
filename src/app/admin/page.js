@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { db } from "@/lib/firebase";
-import { collection, addDoc, getDocs } from "firebase/firestore";
+import { collection, addDoc, getDocs, updateDoc, doc, arrayUnion } from "firebase/firestore";
 
 export default function AdminDashboard() {
   const [surprises, setSurprises] = useState([]);
@@ -9,9 +9,11 @@ export default function AdminDashboard() {
     slug: "",
     name: "",
     relationType: "Friend",
-    letterContent: ""
+    letterContent: "",
+    gallery: []
   });
   const [loading, setLoading] = useState(false);
+  const [uploadingImageId, setUploadingImageId] = useState(null);
 
   useEffect(() => {
     fetchSurprises();
@@ -35,19 +37,56 @@ export default function AdminDashboard() {
     e.preventDefault();
     setLoading(true);
     try {
-      // Create new document in 'surprises' collection
       await addDoc(collection(db, "surprises"), {
         ...formData,
+        gallery: [],
         createdAt: new Date().toISOString()
       });
       alert("Surprise created successfully!");
-      setFormData({ slug: "", name: "", relationType: "Friend", letterContent: "" });
+      setFormData({ slug: "", name: "", relationType: "Friend", letterContent: "", gallery: [] });
       fetchSurprises();
     } catch (error) {
       console.error("Error adding document: ", error);
       alert("Error creating surprise");
     }
     setLoading(false);
+  };
+
+  const handleImageUpload = async (e, surpriseId, slug) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    setUploadingImageId(surpriseId);
+    
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("slug", slug);
+
+    try {
+      // Upload to Cloudinary via our API route
+      const res = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
+      });
+      
+      const result = await res.json();
+      
+      if (result.url) {
+        // Update Firestore document with new image URL
+        const surpriseRef = doc(db, "surprises", surpriseId);
+        await updateDoc(surpriseRef, {
+          gallery: arrayUnion(result.url)
+        });
+        alert("Image uploaded and added to gallery!");
+        fetchSurprises();
+      } else {
+        alert("Upload failed.");
+      }
+    } catch (error) {
+      console.error("Error uploading image:", error);
+      alert("Error uploading image.");
+    }
+    setUploadingImageId(null);
   };
 
   return (
@@ -128,9 +167,24 @@ export default function AdminDashboard() {
           ) : (
             <ul className="space-y-4">
               {surprises.map((s) => (
-                <li key={s.id} className="bg-white/5 p-4 rounded-lg border border-white/10">
-                  <h3 className="text-xl font-bold text-royal-pink">{s.name} <span className="text-sm font-normal text-gray-400">({s.relationType})</span></h3>
-                  <p className="text-sm text-gray-300 mt-2">Link: <a href={`/s/${s.slug}`} target="_blank" className="text-gold-accent hover:underline">/s/{s.slug}</a></p>
+                <li key={s.id} className="bg-white/5 p-4 rounded-lg border border-white/10 flex flex-col space-y-3">
+                  <div>
+                    <h3 className="text-xl font-bold text-royal-pink">{s.name} <span className="text-sm font-normal text-gray-400">({s.relationType})</span></h3>
+                    <p className="text-sm text-gray-300 mt-1">Link: <a href={`/s/${s.slug}`} target="_blank" className="text-gold-accent hover:underline">/s/{s.slug}</a></p>
+                    <p className="text-xs text-gray-400 mt-1">Photos in gallery: {s.gallery?.length || 0}</p>
+                  </div>
+                  
+                  <div className="border-t border-white/10 pt-3">
+                    <label className="block text-sm mb-2 text-gray-300">Add Photo to Gallery (Cloudinary)</label>
+                    <input 
+                      type="file" 
+                      accept="image/*"
+                      onChange={(e) => handleImageUpload(e, s.id, s.slug)}
+                      disabled={uploadingImageId === s.id}
+                      className="text-sm file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-royal-pink file:text-white hover:file:bg-pink-600"
+                    />
+                    {uploadingImageId === s.id && <span className="text-gold-accent text-sm ml-2 animate-pulse">Uploading...</span>}
+                  </div>
                 </li>
               ))}
             </ul>
