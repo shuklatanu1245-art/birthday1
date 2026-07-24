@@ -11,24 +11,28 @@ export default function SurprisePage() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isOpen, setIsOpen] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
 
   useEffect(() => {
     const fetchSurpriseData = async () => {
       try {
-        const q = query(collection(db, "surprises"), where("slug", "==", slug));
+        const decodedSlug = decodeURIComponent(slug);
+        const q = query(collection(db, "surprises"), where("slug", "==", decodedSlug));
         const querySnapshot = await getDocs(q);
         if (!querySnapshot.empty) {
           setData(querySnapshot.docs[0].data());
         } else {
           setData(null);
+          setErrorMsg(`No surprise found for link: /s/${decodedSlug}`);
         }
       } catch (error) {
         console.error("Error fetching data:", error);
+        setErrorMsg(error.message);
       }
       setLoading(false);
     };
 
-    fetchSurpriseData();
+    if (slug) fetchSurpriseData();
   }, [slug]);
 
   const handleOpen = () => {
@@ -67,7 +71,12 @@ export default function SurprisePage() {
   }
 
   if (!data) {
-    return <div className="min-h-screen flex items-center justify-center bg-midnight-blue text-white text-2xl font-serif">Oops! Surprise not found.</div>;
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-midnight-blue text-white text-2xl font-serif p-8 text-center">
+        <p className="mb-4">Oops! Surprise not found.</p>
+        {errorMsg && <p className="text-sm text-royal-pink font-sans">Debug Info: {errorMsg}</p>}
+      </div>
+    );
   }
 
   // Determine theme based on relation
