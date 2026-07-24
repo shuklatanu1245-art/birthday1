@@ -1,7 +1,5 @@
 "use client";
 import { useState, useEffect } from "react";
-import { db } from "@/lib/firebase";
-import { collection, addDoc, getDocs, updateDoc, doc, arrayUnion } from "firebase/firestore";
 
 export default function AdminDashboard() {
   const [surprises, setSurprises] = useState([]);
@@ -22,13 +20,14 @@ export default function AdminDashboard() {
     fetchSurprises();
   }, []);
 
-  const fetchSurprises = async () => {
+  const fetchSurprises = () => {
     try {
-      const querySnapshot = await getDocs(collection(db, "surprises"));
-      const data = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      setSurprises(data);
+      const stored = localStorage.getItem("localSurprises");
+      if (stored) {
+        setSurprises(JSON.parse(stored));
+      }
     } catch (error) {
-      console.error("Error fetching surprises:", error);
+      console.error("Error reading localStorage:", error);
     }
   };
 
@@ -73,16 +72,34 @@ export default function AdminDashboard() {
     }
     setLoading(true);
     try {
-      await addDoc(collection(db, "surprises"), {
+      const surpriseData = {
+        id: Date.now().toString(),
         ...formData,
         gallery: [],
         createdAt: new Date().toISOString()
+      };
+
+      // Save to Cloudinary via our API route
+      const res = await fetch("/api/save-data", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(surpriseData),
       });
-      alert("Surprise created successfully!");
-      setFormData({ slug: "", name: "", relationType: "Friend", celebrationType: "Party", letterContent: "", friendPhoto: "", gallery: [] });
-      fetchSurprises();
+
+      const result = await res.json();
+      if (res.ok) {
+        // Save locally to show in the list
+        const updatedSurprises = [surpriseData, ...surprises];
+        setSurprises(updatedSurprises);
+        localStorage.setItem("localSurprises", JSON.stringify(updatedSurprises));
+
+        alert("Surprise created successfully!");
+        setFormData({ slug: "", name: "", relationType: "Friend", celebrationType: "Party", letterContent: "", friendPhoto: "", gallery: [] });
+      } else {
+        alert("Error saving data: " + result.error);
+      }
     } catch (error) {
-      console.error("Error adding document: ", error);
+      console.error("Error creating surprise: ", error);
       alert("Error creating surprise");
     }
     setLoading(false);
@@ -107,12 +124,25 @@ export default function AdminDashboard() {
       const result = await res.json();
       
       if (result.url) {
-        const surpriseRef = doc(db, "surprises", surpriseId);
-        await updateDoc(surpriseRef, {
-          gallery: arrayUnion(result.url)
-        });
-        alert("Image uploaded and added to gallery!");
-        fetchSurprises();
+        // Update local list
+        const targetSurprise = surprises.find(s => s.id === surpriseId);
+        if (targetSurprise) {
+          targetSurprise.gallery = [...(targetSurprise.gallery || []), result.url];
+          
+          // Resave updated json to Cloudinary
+          await fetch("/api/save-data", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(targetSurprise),
+          });
+
+          // Update local state
+          const newSurprises = surprises.map(s => s.id === surpriseId ? targetSurprise : s);
+          setSurprises(newSurprises);
+          localStorage.setItem("localSurprises", JSON.stringify(newSurprises));
+          
+          alert("Image uploaded and added to gallery!");
+        }
       } else {
         alert("Upload failed: " + (result.error || "Unknown error"));
       }

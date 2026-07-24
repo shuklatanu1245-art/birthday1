@@ -1,8 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
-import { db } from "@/lib/firebase";
-import { collection, query, where, getDocs } from "firebase/firestore";
 import { motion, AnimatePresence } from "framer-motion";
 import confetti from "canvas-confetti";
 
@@ -17,10 +15,14 @@ export default function SurprisePage() {
     const fetchSurpriseData = async () => {
       try {
         const decodedSlug = decodeURIComponent(slug);
-        const q = query(collection(db, "surprises"), where("slug", "==", decodedSlug));
-        const querySnapshot = await getDocs(q);
-        if (!querySnapshot.empty) {
-          setData(querySnapshot.docs[0].data());
+        const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || "fu2otsgk";
+        const url = `https://res.cloudinary.com/${cloudName}/raw/upload/birthday_surprises/data/${decodedSlug}.json`;
+        
+        const res = await fetch(url, { cache: 'no-store' }); // Disable cache to get fresh updates
+        
+        if (res.ok) {
+          const fetchedData = await res.json();
+          setData(fetchedData);
         } else {
           setData(null);
           setErrorMsg(`No surprise found for link: /s/${decodedSlug}`);
