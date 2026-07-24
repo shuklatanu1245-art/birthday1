@@ -16,6 +16,7 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(false);
   const [uploadingImageId, setUploadingImageId] = useState(null);
   const [uploadingProfile, setUploadingProfile] = useState(false);
+  const [deletingId, setDeletingId] = useState(null);
 
   useEffect(() => {
     fetchSurprises();
@@ -154,6 +155,33 @@ export default function AdminDashboard() {
     setUploadingImageId(null);
   };
 
+  const handleDeleteSurprise = async (id, slug) => {
+    if (!confirm("Are you sure you want to delete this surprise? This action cannot be undone.")) return;
+    
+    setDeletingId(id);
+    try {
+      const res = await fetch("/api/delete-data", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ slug }),
+      });
+      
+      if (res.ok) {
+        const newSurprises = surprises.filter(s => s.id !== id);
+        setSurprises(newSurprises);
+        localStorage.setItem("localSurprises", JSON.stringify(newSurprises));
+        alert("Surprise deleted successfully!");
+      } else {
+        const result = await res.json();
+        alert("Failed to delete: " + result.error);
+      }
+    } catch (error) {
+      console.error("Error deleting surprise:", error);
+      alert("Error deleting surprise.");
+    }
+    setDeletingId(null);
+  };
+
   return (
     <div className="min-h-screen bg-midnight-blue p-8 text-white">
       <h1 className="text-4xl font-serif text-gold-accent mb-8">Admin Dashboard</h1>
@@ -283,11 +311,18 @@ export default function AdminDashboard() {
                 <li key={s.id} className="bg-white/5 p-4 rounded-lg border border-white/10 flex flex-col space-y-3">
                   <div className="flex items-center space-x-4">
                     {s.friendPhoto && <img src={s.friendPhoto} alt={s.name} className="w-12 h-12 rounded-full object-cover border-2 border-gold-accent" />}
-                    <div>
+                    <div className="flex-1">
                       <h3 className="text-xl font-bold text-royal-pink">{s.name} <span className="text-sm font-normal text-gray-400">({s.relationType} - {s.celebrationType})</span></h3>
                       <p className="text-sm text-gray-300 mt-1">Link: <a href={`/s/${s.slug}`} target="_blank" className="text-gold-accent hover:underline">/s/{s.slug}</a></p>
                       <p className="text-xs text-gray-400 mt-1">Photos in gallery: {s.gallery?.length || 0}</p>
                     </div>
+                    <button 
+                      onClick={() => handleDeleteSurprise(s.id, s.slug)}
+                      disabled={deletingId === s.id}
+                      className="px-3 py-1 bg-red-600/80 hover:bg-red-500 text-white text-sm rounded transition-colors"
+                    >
+                      {deletingId === s.id ? "Deleting..." : "Delete"}
+                    </button>
                   </div>
                   
                   <div className="border-t border-white/10 pt-3">
