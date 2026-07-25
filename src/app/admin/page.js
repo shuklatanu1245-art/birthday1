@@ -245,10 +245,18 @@ export default function AdminDashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-midnight-blue p-8 text-white">
-      <h1 className="text-4xl font-serif text-gold-accent mb-8">Admin Dashboard</h1>
+    <div className="min-h-screen bg-midnight-blue p-6 md:p-8 text-white">
+      <div className="flex justify-between items-center mb-8 border-b border-white/15 pb-4 max-w-7xl mx-auto">
+        <h1 className="text-3xl md:text-4xl font-serif text-gold-accent font-bold">👑 Admin Dashboard</h1>
+        <a 
+          href="/" 
+          className="px-4 py-2 bg-white/10 hover:bg-gold-accent hover:text-midnight-blue text-white rounded-full text-xs md:text-sm font-bold border border-white/20 transition-all flex items-center space-x-2"
+        >
+          <span>🏠 Back to Home</span>
+        </a>
+      </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-7xl mx-auto">
         {/* Create Form */}
         <div className="glassmorphism p-6">
           <h2 className="text-2xl font-bold mb-4">Create New Surprise</h2>

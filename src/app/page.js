@@ -43,7 +43,18 @@ export default function Home() {
       ref={containerRef}
       className="relative min-h-screen flex flex-col items-center justify-center aurora-bg overflow-hidden"
     >
-      {/* Background Floating Elements could be added here using Framer Motion or Particles.js */}
+      {/* Top Bar for Admin Navigation */}
+      <header className="absolute top-0 left-0 right-0 p-4 md:p-6 flex justify-between items-center z-50 max-w-7xl mx-auto w-full">
+        <div className="flex items-center space-x-2 font-serif text-gold-accent font-bold text-lg md:text-xl tracking-wider drop-shadow-md">
+          <span>👑 Premium Birthday Studio</span>
+        </div>
+        <a 
+          href="/admin" 
+          className="px-4 py-2 md:px-6 md:py-2.5 rounded-full bg-glass-bg border border-gold-accent/50 text-gold-accent hover:bg-gold-accent hover:text-midnight-blue font-sans text-xs md:text-sm font-bold tracking-wide transition-all shadow-lg shadow-black/50 backdrop-blur-md flex items-center space-x-2"
+        >
+          <span>⚡ Admin Panel (Create & Manage)</span>
+        </a>
+      </header>
       
       <AnimatePresence>
         {!isOpen && (
