@@ -3,6 +3,8 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import confetti from "canvas-confetti";
+import MemoryTimeline from "@/components/MemoryTimeline";
+import Cake3D from "@/components/Cake3D";
 
 export default function SurprisePage() {
   const { slug } = useParams();
@@ -188,6 +190,12 @@ export default function SurprisePage() {
                 )}
               </div>
             </div>
+
+            {/* Interactive 3D Cake Section */}
+            <Cake3D themeColor={theme.colors?.[0] || "#D12260"} />
+
+            {/* Memory Timeline Section */}
+            <MemoryTimeline timeline={data.timeline} themeColor={theme.colors?.[0] || "#FFD700"} />
             
             {/* Gallery Section */}
             {data.gallery && data.gallery.length > 0 && (

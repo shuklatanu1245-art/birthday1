@@ -14,6 +14,7 @@ export default function AdminDashboard() {
     customAudio: "",
     gallery: []
   });
+  const [timelineInput, setTimelineInput] = useState({});
   const [loading, setLoading] = useState(false);
   const [uploadingImageId, setUploadingImageId] = useState(null);
   const [uploadingProfile, setUploadingProfile] = useState(false);
@@ -184,6 +185,36 @@ export default function AdminDashboard() {
       alert("Error uploading image. Check console.");
     }
     setUploadingImageId(null);
+  };
+
+  const handleAddTimeline = async (surpriseId) => {
+    const item = timelineInput[surpriseId];
+    if (!item || !item.title || !item.description) {
+      alert("Please enter at least Title and Description for the milestone.");
+      return;
+    }
+
+    const targetSurprise = surprises.find(s => s.id === surpriseId);
+    if (!targetSurprise) return;
+
+    targetSurprise.timeline = [...(targetSurprise.timeline || []), { ...item, year: item.year || "Milestone", emoji: item.emoji || "✨" }];
+
+    try {
+      await fetch("/api/save-data", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(targetSurprise),
+      });
+
+      const newSurprises = surprises.map(s => s.id === surpriseId ? targetSurprise : s);
+      setSurprises(newSurprises);
+      localStorage.setItem("localSurprises", JSON.stringify(newSurprises));
+      setTimelineInput({ ...timelineInput, [surpriseId]: { year: "", title: "", description: "", emoji: "" } });
+      alert("Timeline milestone added successfully!");
+    } catch (error) {
+      console.error("Error adding timeline item:", error);
+      alert("Failed to save timeline item.");
+    }
   };
 
   const handleDeleteSurprise = async (id, slug) => {
@@ -385,6 +416,50 @@ export default function AdminDashboard() {
                       className="text-sm file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-royal-pink file:text-white hover:file:bg-pink-600"
                     />
                     {uploadingImageId === s.id && <span className="text-gold-accent text-sm ml-2 animate-pulse">Uploading...</span>}
+                  </div>
+
+                  <div className="border-t border-white/10 pt-3 space-y-2">
+                    <label className="block text-sm text-gray-300 font-semibold">Add Milestone to Memory Timeline</label>
+                    <div className="grid grid-cols-3 gap-2">
+                      <input 
+                        type="text" 
+                        placeholder="Year/Tag (e.g. 2023)" 
+                        value={timelineInput[s.id]?.year || ""} 
+                        onChange={(e) => setTimelineInput({ ...timelineInput, [s.id]: { ...(timelineInput[s.id] || {}), year: e.target.value } })}
+                        className="bg-white/10 border border-white/20 rounded p-1.5 text-xs text-white" 
+                      />
+                      <input 
+                        type="text" 
+                        placeholder="Title (e.g. Goa Trip)" 
+                        value={timelineInput[s.id]?.title || ""} 
+                        onChange={(e) => setTimelineInput({ ...timelineInput, [s.id]: { ...(timelineInput[s.id] || {}), title: e.target.value } })}
+                        className="bg-white/10 border border-white/20 rounded p-1.5 text-xs text-white" 
+                      />
+                      <input 
+                        type="text" 
+                        placeholder="Emoji (e.g. ✈️)" 
+                        value={timelineInput[s.id]?.emoji || ""} 
+                        onChange={(e) => setTimelineInput({ ...timelineInput, [s.id]: { ...(timelineInput[s.id] || {}), emoji: e.target.value } })}
+                        className="bg-white/10 border border-white/20 rounded p-1.5 text-xs text-white" 
+                      />
+                    </div>
+                    <div className="flex space-x-2">
+                      <input 
+                        type="text" 
+                        placeholder="Description (e.g. We danced under the stars all night...)" 
+                        value={timelineInput[s.id]?.description || ""} 
+                        onChange={(e) => setTimelineInput({ ...timelineInput, [s.id]: { ...(timelineInput[s.id] || {}), description: e.target.value } })}
+                        className="flex-1 bg-white/10 border border-white/20 rounded p-1.5 text-xs text-white" 
+                      />
+                      <button 
+                        type="button"
+                        onClick={() => handleAddTimeline(s.id)}
+                        className="px-3 py-1 bg-gold-accent hover:bg-white text-midnight-blue font-bold text-xs rounded transition"
+                      >
+                        Add
+                      </button>
+                    </div>
+                    <p className="text-[10px] text-gray-400">Current custom milestones: {s.timeline?.length || 0} (Default chapters shown if 0)</p>
                   </div>
                 </li>
               ))}
