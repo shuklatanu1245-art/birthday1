@@ -69,8 +69,8 @@ function Smoke({ blown }) {
 // Complete 3D Cake Model
 function CakeModel({ blown, themeColor = "#D12260", photoUrl }) {
   return (
-    <group position={[0, -1.1, 0]}>
-      <Float speed={1.5} rotationIntensity={0.2} floatIntensity={0.3}>
+    <group position={[0, -1.6, 0]}>
+      <Float speed={1.5} rotationIntensity={0.2} floatIntensity={0.2}>
         {/* Cake Stand / Plate */}
         <mesh position={[0, -0.7, 0]}>
           <cylinderGeometry args={[2.5, 2.7, 0.15, 64]} />
@@ -260,9 +260,9 @@ export default function Cake3D({ themeColor = "#D12260", photoUrl }) {
         </p>
       </div>
 
-      {/* 3D Canvas Container - Increased height and pulled back camera so nothing is cut off */}
-      <div className="w-full h-[480px] md:h-[560px] relative rounded-3xl overflow-hidden glassmorphism border-2 border-gold-accent/40 shadow-2xl bg-gradient-to-b from-white/10 via-black/50 to-black/80 mb-8 cursor-grab active:cursor-grabbing">
-        <Canvas camera={{ position: [0, 0.8, 6.8], fov: 52 }}>
+      {/* 3D Canvas Container - Perfectly centered camera and target */}
+      <div className="w-full h-[500px] md:h-[580px] relative rounded-3xl overflow-hidden glassmorphism border-2 border-gold-accent/40 shadow-2xl bg-gradient-to-b from-white/10 via-black/50 to-black/80 mb-8 cursor-grab active:cursor-grabbing">
+        <Canvas camera={{ position: [0, -0.3, 8.5], fov: 46 }}>
           <ambientLight intensity={1.2} />
           <directionalLight position={[10, 10, 5]} intensity={2.0} castShadow />
           <pointLight position={[0, 5, 0]} intensity={1.5} color="#ffffff" />
@@ -270,9 +270,10 @@ export default function Cake3D({ themeColor = "#D12260", photoUrl }) {
           <CakeModel blown={blown} themeColor={themeColor} photoUrl={photoUrl} />
           
           <OrbitControls 
+            target={[0, -0.9, 0]}
             enablePan={false} 
-            minDistance={4} 
-            maxDistance={8} 
+            minDistance={5} 
+            maxDistance={9} 
             maxPolarAngle={Math.PI / 2 + 0.05}
             minPolarAngle={Math.PI / 6}
           />
