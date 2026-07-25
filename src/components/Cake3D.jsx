@@ -1,8 +1,8 @@
 "use client";
 import React, { useState, useEffect, useRef } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { OrbitControls, Float, Sparkles, ContactShadows } from "@react-three/drei";
-import { motion, AnimatePresence } from "framer-motion";
+import { OrbitControls, Float, Sparkles, ContactShadows, Html } from "@react-three/drei";
+import { motion } from "framer-motion";
 import confetti from "canvas-confetti";
 
 // Flickering Flame Component
@@ -14,30 +14,30 @@ function Flame({ blown }) {
     if (!flameRef.current || blown) return;
     const t = clock.getElapsedTime() * 10;
     // Flickering scale animation
-    const scaleX = 1 + Math.sin(t) * 0.1;
-    const scaleY = 1 + Math.cos(t * 1.2) * 0.15;
+    const scaleX = 1 + Math.sin(t) * 0.15;
+    const scaleY = 1 + Math.cos(t * 1.2) * 0.2;
     flameRef.current.scale.set(scaleX, scaleY, scaleX);
     if (lightRef.current) {
-      lightRef.current.intensity = 2.5 + Math.sin(t * 2) * 0.5;
+      lightRef.current.intensity = 4 + Math.sin(t * 2) * 1;
     }
   });
 
   if (blown) return null;
 
   return (
-    <group position={[0, 1.7, 0]}>
+    <group position={[0, 2.05, -0.4]}>
       {/* Outer Glow */}
       <mesh ref={flameRef} position={[0, 0, 0]}>
-        <sphereGeometry args={[0.2, 16, 16]} />
-        <meshBasicMaterial color="#ff9900" transparent opacity={0.8} />
+        <sphereGeometry args={[0.25, 16, 16]} />
+        <meshBasicMaterial color="#ff7700" transparent opacity={0.85} />
       </mesh>
       {/* Inner Core */}
       <mesh position={[0, -0.05, 0]}>
-        <sphereGeometry args={[0.1, 16, 16]} />
-        <meshBasicMaterial color="#ffffaa" />
+        <sphereGeometry args={[0.14, 16, 16]} />
+        <meshBasicMaterial color="#ffffcc" />
       </mesh>
-      {/* Point light to illuminate cake */}
-      <pointLight ref={lightRef} color="#ffaa00" intensity={3} distance={6} decay={2} />
+      {/* Point light to illuminate cake brightly */}
+      <pointLight ref={lightRef} color="#ffbb00" intensity={5} distance={8} decay={1.5} />
     </group>
   );
 }
@@ -45,13 +45,12 @@ function Flame({ blown }) {
 // Smoke when blown
 function Smoke({ blown }) {
   const smokeRef = useRef();
-  const [opacity, setOpacity] = useState(0.8);
 
   useFrame((_, delta) => {
     if (!smokeRef.current || !blown) return;
-    smokeRef.current.position.y += delta * 0.8;
-    smokeRef.current.scale.x += delta * 0.5;
-    smokeRef.current.scale.z += delta * 0.5;
+    smokeRef.current.position.y += delta * 1.0;
+    smokeRef.current.scale.x += delta * 0.6;
+    smokeRef.current.scale.z += delta * 0.6;
     if (smokeRef.current.material) {
       smokeRef.current.material.opacity = Math.max(0, smokeRef.current.material.opacity - delta * 0.4);
     }
@@ -60,74 +59,83 @@ function Smoke({ blown }) {
   if (!blown) return null;
 
   return (
-    <mesh ref={smokeRef} position={[0, 1.7, 0]}>
-      <sphereGeometry args={[0.15, 16, 16]} />
-      <meshBasicMaterial color="#cccccc" transparent opacity={0.6} />
+    <mesh ref={smokeRef} position={[0, 2.05, -0.4]}>
+      <sphereGeometry args={[0.2, 16, 16]} />
+      <meshBasicMaterial color="#dddddd" transparent opacity={0.7} />
     </mesh>
   );
 }
 
 // Complete 3D Cake Model
-function CakeModel({ blown, themeColor = "#D12260" }) {
+function CakeModel({ blown, themeColor = "#D12260", photoUrl }) {
   return (
-    <group position={[0, -0.5, 0]}>
-      <Float speed={1.5} rotationIntensity={0.2} floatIntensity={0.5}>
+    <group position={[0, -1.1, 0]}>
+      <Float speed={1.5} rotationIntensity={0.2} floatIntensity={0.3}>
         {/* Cake Stand / Plate */}
         <mesh position={[0, -0.7, 0]}>
           <cylinderGeometry args={[2.5, 2.7, 0.15, 64]} />
-          <meshStandardMaterial color="#eeeeee" metalness={0.6} roughness={0.2} />
+          <meshStandardMaterial color="#ffffff" metalness={0.8} roughness={0.1} />
         </mesh>
         <mesh position={[0, -0.9, 0]}>
           <cylinderGeometry args={[1.2, 1.5, 0.3, 32]} />
-          <meshStandardMaterial color="#cccccc" metalness={0.6} roughness={0.2} />
+          <meshStandardMaterial color="#dddddd" metalness={0.7} roughness={0.2} />
         </mesh>
 
         {/* Bottom Cake Layer */}
         <mesh position={[0, -0.2, 0]} castShadow receiveShadow>
           <cylinderGeometry args={[2, 2, 0.9, 64]} />
-          <meshStandardMaterial color={themeColor} roughness={0.4} />
+          <meshStandardMaterial color={themeColor} roughness={0.3} metalness={0.1} />
         </mesh>
 
         {/* Middle Icing Layer */}
         <mesh position={[0, 0.28, 0]}>
           <cylinderGeometry args={[2.02, 2.02, 0.1, 64]} />
-          <meshStandardMaterial color="#fffdd0" roughness={0.3} />
+          <meshStandardMaterial color="#fffdd0" roughness={0.2} />
         </mesh>
 
         {/* Top Cake Layer */}
         <mesh position={[0, 0.65, 0]} castShadow receiveShadow>
           <cylinderGeometry args={[1.5, 1.5, 0.7, 64]} />
-          <meshStandardMaterial color="#ff99a8" roughness={0.4} />
+          <meshStandardMaterial color="#ff8899" roughness={0.3} />
         </mesh>
 
         {/* Top Cream Drips / Frosting */}
         <mesh position={[0, 1.02, 0]}>
           <cylinderGeometry args={[1.52, 1.52, 0.08, 64]} />
-          <meshStandardMaterial color="#ffffff" roughness={0.2} />
+          <meshStandardMaterial color="#ffffff" roughness={0.1} />
         </mesh>
 
-        {/* Decorative Cherries/Balls around top */}
+        {/* Decorative Cherries around top */}
         {[...Array(8)].map((_, i) => {
           const angle = (i / 8) * Math.PI * 2;
           const x = Math.cos(angle) * 1.2;
           const z = Math.sin(angle) * 1.2;
           return (
             <mesh key={i} position={[x, 1.1, z]}>
-              <sphereGeometry args={[0.12, 16, 16]} />
-              <meshStandardMaterial color="#ff0033" roughness={0.1} metalness={0.2} />
+              <sphereGeometry args={[0.13, 16, 16]} />
+              <meshStandardMaterial color="#ff0033" roughness={0.1} metalness={0.3} />
             </mesh>
           );
         })}
 
-        {/* Candle */}
-        <mesh position={[0, 1.35, 0]}>
-          <cylinderGeometry args={[0.08, 0.08, 0.7, 32]} />
-          <meshStandardMaterial color="#33ccff" roughness={0.3} />
+        {/* Standing Photo Frame Topper on the Cake */}
+        {photoUrl && (
+          <Html position={[0, 1.55, 0.3]} transform distanceFactor={5}>
+            <div className="w-24 h-24 md:w-28 md:h-28 rounded-full border-4 border-gold-accent shadow-[0_0_25px_rgba(255,215,0,0.9)] overflow-hidden bg-midnight-blue flex items-center justify-center pointer-events-none transform -translate-x-1/2 -translate-y-1/2">
+              <img src={photoUrl} alt="Cake Topper" className="w-full h-full object-cover" />
+            </div>
+          </Html>
+        )}
+
+        {/* Thick, Highly Visible Candle (positioned slightly behind photo topper) */}
+        <mesh position={[0, 1.45, -0.4]}>
+          <cylinderGeometry args={[0.12, 0.12, 0.85, 32]} />
+          <meshStandardMaterial color="#ffffff" roughness={0.2} />
         </mesh>
         {/* Candle Wick */}
-        <mesh position={[0, 1.72, 0]}>
-          <cylinderGeometry args={[0.015, 0.015, 0.08, 16]} />
-          <meshBasicMaterial color="#222222" />
+        <mesh position={[0, 1.9, -0.4]}>
+          <cylinderGeometry args={[0.02, 0.02, 0.1, 16]} />
+          <meshBasicMaterial color="#111111" />
         </mesh>
 
         {/* Animated Flame */}
@@ -135,15 +143,15 @@ function CakeModel({ blown, themeColor = "#D12260" }) {
         <Smoke blown={blown} />
 
         {/* Sparkles around cake */}
-        <Sparkles count={40} scale={4} size={3} speed={0.4} opacity={0.7} color="#FFD700" />
+        <Sparkles count={50} scale={5} size={4} speed={0.5} opacity={0.8} color="#FFD700" />
       </Float>
 
-      <ContactShadows position={[0, -1.05, 0]} opacity={0.6} scale={10} blur={2} far={4} />
+      <ContactShadows position={[0, -1.8, 0]} opacity={0.7} scale={12} blur={2.5} far={5} />
     </group>
   );
 }
 
-export default function Cake3D({ themeColor = "#D12260" }) {
+export default function Cake3D({ themeColor = "#D12260", photoUrl }) {
   const [blown, setBlown] = useState(false);
   const [micActive, setMicActive] = useState(false);
   const [micError, setMicError] = useState("");
@@ -160,25 +168,25 @@ export default function Cake3D({ themeColor = "#D12260" }) {
 
     // Massive Confetti Explosion
     confetti({
-      particleCount: 150,
-      spread: 100,
+      particleCount: 180,
+      spread: 120,
       origin: { y: 0.6 },
-      colors: ['#ff0a54', '#ff477e', '#ff7096', '#FFD700', '#00f5d4']
+      colors: ['#ff0a54', '#ff477e', '#ff7096', '#FFD700', '#00f5d4', '#ffffff']
     });
     setTimeout(() => {
       confetti({
-        particleCount: 100,
+        particleCount: 120,
         angle: 60,
         spread: 80,
         origin: { x: 0 },
       });
       confetti({
-        particleCount: 100,
+        particleCount: 120,
         angle: 120,
         spread: 80,
         origin: { x: 1 },
       });
-    }, 400);
+    }, 300);
   };
 
   // Start Microphone Air Blow Detection
@@ -210,8 +218,8 @@ export default function Cake3D({ themeColor = "#D12260" }) {
         }
         const average = sum / bufferLength;
 
-        // Threshold for blowing into mic (usually causes high low-frequency noise / high average amplitude > 45)
-        if (average > 45) {
+        // Threshold for blowing into mic (air pressure onto mic diaphragm creates high amplitude > 35)
+        if (average > 35) {
           handleBlow();
         } else {
           animationFrameRef.current = requestAnimationFrame(checkVolume);
@@ -221,7 +229,7 @@ export default function Cake3D({ themeColor = "#D12260" }) {
       checkVolume();
     } catch (err) {
       console.error("Microphone access denied:", err);
-      setMicError("Mic access denied or unavailable. Please tap the button below to blow!");
+      setMicError("Microphone permission denied! Please allow microphone access in your browser settings to blow out the candle.");
       setMicActive(false);
     }
   };
@@ -247,77 +255,67 @@ export default function Cake3D({ themeColor = "#D12260" }) {
         <h2 className="text-4xl md:text-5xl font-serif text-gold-accent mb-3 drop-shadow-md">
           Make a Wish & Blow the Candle! 🎂
         </h2>
-        <p className="text-gray-300 text-lg font-sans max-w-md mx-auto">
-          Rotate the 3D birthday cake, close your eyes, make your special birthday wish, and blow out the candle!
+        <p className="text-gray-200 text-lg font-sans max-w-md mx-auto">
+          Rotate the 3D birthday cake with your finger, make your special wish, and blow air into your microphone to extinguish the candle!
         </p>
       </div>
 
-      {/* 3D Canvas Container */}
-      <div className="w-full h-[400px] md:h-[480px] relative rounded-3xl overflow-hidden glassmorphism border border-white/20 shadow-2xl bg-gradient-to-b from-white/5 to-black/40 mb-8 cursor-grab active:cursor-grabbing">
-        <Canvas camera={{ position: [0, 1.5, 5], fov: 50 }}>
-          <ambientLight intensity={0.7} />
-          <directionalLight position={[10, 10, 5]} intensity={1.5} castShadow />
-          <pointLight position={[-10, -10, -10]} intensity={0.5} />
+      {/* 3D Canvas Container - Increased height and pulled back camera so nothing is cut off */}
+      <div className="w-full h-[480px] md:h-[560px] relative rounded-3xl overflow-hidden glassmorphism border-2 border-gold-accent/40 shadow-2xl bg-gradient-to-b from-white/10 via-black/50 to-black/80 mb-8 cursor-grab active:cursor-grabbing">
+        <Canvas camera={{ position: [0, 0.8, 6.8], fov: 52 }}>
+          <ambientLight intensity={1.2} />
+          <directionalLight position={[10, 10, 5]} intensity={2.0} castShadow />
+          <pointLight position={[0, 5, 0]} intensity={1.5} color="#ffffff" />
           
-          <CakeModel blown={blown} themeColor={themeColor} />
+          <CakeModel blown={blown} themeColor={themeColor} photoUrl={photoUrl} />
           
           <OrbitControls 
             enablePan={false} 
-            minDistance={3} 
-            maxDistance={7} 
-            maxPolarAngle={Math.PI / 2 + 0.1}
+            minDistance={4} 
+            maxDistance={8} 
+            maxPolarAngle={Math.PI / 2 + 0.05}
             minPolarAngle={Math.PI / 6}
           />
         </Canvas>
         
-        <div className="absolute bottom-4 right-4 bg-black/60 backdrop-blur-md px-3 py-1 rounded-full text-xs text-gray-300 pointer-events-none border border-white/10">
-          👆 Drag to rotate view
+        <div className="absolute bottom-4 right-4 bg-black/70 backdrop-blur-md px-3.5 py-1.5 rounded-full text-xs text-gold-accent font-bold pointer-events-none border border-gold-accent/40 shadow-lg">
+          👆 Drag to rotate 3D view
         </div>
       </div>
 
-      {/* Control Buttons */}
-      <div className="flex flex-col sm:flex-row items-center justify-center gap-4 w-full max-w-md">
+      {/* Control Buttons - Only Mic Button */}
+      <div className="flex flex-col items-center justify-center w-full max-w-lg">
         {!blown ? (
-          <>
+          <div className="w-full flex flex-col items-center">
             {!micActive ? (
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={startMic}
-                className="w-full sm:w-auto px-6 py-3 bg-gradient-to-r from-royal-pink to-pink-600 hover:from-pink-500 hover:to-pink-700 text-white font-bold rounded-full shadow-lg shadow-pink-500/30 flex items-center justify-center space-x-2 border border-pink-400/50 transition-all"
+                className="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-gold-accent via-royal-pink to-pink-600 hover:opacity-95 text-midnight-blue font-extrabold text-lg md:text-xl tracking-wide rounded-full shadow-2xl shadow-pink-500/50 flex items-center justify-center space-x-3 border-2 border-white/50 transition-all cursor-pointer"
               >
-                <span className="text-xl">🎙️</span>
-                <span>Blow Into Mic</span>
+                <span className="text-2xl animate-bounce">🎙️</span>
+                <span>Click Here & Blow Into Mic to Extinguish Candle! 🕯️💨</span>
               </motion.button>
             ) : (
-              <div className="w-full sm:w-auto px-6 py-3 bg-red-600/80 animate-pulse text-white font-bold rounded-full flex items-center justify-center space-x-2 border border-red-400">
-                <span className="text-xl">💨</span>
-                <span>Blowing... Blow towards mic now!</span>
+              <div className="w-full sm:w-auto px-8 py-4 bg-red-600 animate-pulse text-white font-extrabold text-lg md:text-xl rounded-full flex items-center justify-center space-x-3 border-2 border-yellow-300 shadow-2xl shadow-red-500/50">
+                <span className="text-2xl animate-spin">💨</span>
+                <span>Blowing Active... Blow air towards your mic NOW! 🎂</span>
               </div>
             )}
-
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={handleBlow}
-              className="w-full sm:w-auto px-6 py-3 bg-gold-accent hover:bg-white text-midnight-blue font-bold rounded-full shadow-lg shadow-gold-accent/30 flex items-center justify-center space-x-2 transition-all"
-            >
-              <span className="text-xl">👆</span>
-              <span>Tap to Blow Candle</span>
-            </motion.button>
-          </>
+          </div>
         ) : (
           <motion.div
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             className="flex flex-col items-center space-y-4 w-full"
           >
-            <div className="bg-gradient-to-r from-gold-accent/20 via-royal-pink/20 to-gold-accent/20 border border-gold-accent p-4 rounded-2xl text-center backdrop-blur-md w-full">
-              <h3 className="text-2xl font-serif font-bold text-gold-accent animate-bounce mb-1">
+            <div className="bg-gradient-to-r from-gold-accent/30 via-royal-pink/30 to-gold-accent/30 border-2 border-gold-accent p-6 rounded-2xl text-center backdrop-blur-md w-full shadow-2xl shadow-gold-accent/20">
+              <h3 className="text-3xl font-serif font-bold text-gold-accent animate-bounce mb-2">
                 🎉 Wish Granted! 🎂
               </h3>
-              <p className="text-white text-sm">
-                May all your dreams and wishes come true this year!
+              <p className="text-white text-base font-sans font-medium">
+                May all your dreams, happiness, and desires come true this year! ✨
               </p>
             </div>
 
@@ -325,7 +323,7 @@ export default function Cake3D({ themeColor = "#D12260" }) {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => setBlown(false)}
-              className="px-6 py-2 bg-white/10 hover:bg-white/20 text-gray-300 text-sm rounded-full border border-white/20 transition-all"
+              className="px-6 py-2.5 bg-white/10 hover:bg-white/20 text-gold-accent font-bold text-sm rounded-full border border-gold-accent/40 transition-all shadow-md"
             >
               🔥 Light Candle Again
             </motion.button>
@@ -334,8 +332,8 @@ export default function Cake3D({ themeColor = "#D12260" }) {
       </div>
 
       {micError && (
-        <p className="text-xs text-red-400 mt-3 text-center bg-red-950/40 border border-red-500/30 px-3 py-1.5 rounded-lg max-w-sm">
-          {micError}
+        <p className="text-xs text-red-400 mt-4 text-center bg-red-950/80 border border-red-500 px-4 py-2 rounded-xl max-w-md shadow-lg">
+          ⚠️ {micError}
         </p>
       )}
     </section>

@@ -192,7 +192,7 @@ export default function SurprisePage() {
             </div>
 
             {/* Interactive 3D Cake Section */}
-            <Cake3D themeColor={theme.colors?.[0] || "#D12260"} />
+            <Cake3D themeColor={theme.colors?.[0] || "#D12260"} photoUrl={data.cakePhoto || data.friendPhoto} />
 
             {/* Memory Timeline Section */}
             <MemoryTimeline timeline={data.timeline} themeColor={theme.colors?.[0] || "#FFD700"} />

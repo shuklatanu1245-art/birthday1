@@ -11,6 +11,7 @@ export default function AdminDashboard() {
     celebrationType: "Party",
     letterContent: "",
     friendPhoto: "",
+    cakePhoto: "",
     customAudio: "",
     gallery: []
   });
@@ -18,6 +19,7 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(false);
   const [uploadingImageId, setUploadingImageId] = useState(null);
   const [uploadingProfile, setUploadingProfile] = useState(false);
+  const [uploadingCakePhoto, setUploadingCakePhoto] = useState(false);
   const [uploadingAudio, setUploadingAudio] = useState(false);
   const [deletingId, setDeletingId] = useState(null);
 
@@ -67,6 +69,35 @@ export default function AdminDashboard() {
       alert("Error uploading profile photo. Check console.");
     }
     setUploadingProfile(false);
+  };
+
+  const handleCakePhotoUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    setUploadingCakePhoto(true);
+    
+    const uploadData = new FormData();
+    uploadData.append("file", file);
+    uploadData.append("slug", formData.slug || "caketoppers");
+
+    try {
+      const res = await fetch("/api/upload", {
+        method: "POST",
+        body: uploadData,
+      });
+      const result = await res.json();
+      if (result.url) {
+        setFormData({ ...formData, cakePhoto: result.url });
+        alert("Cake photo uploaded!");
+      } else {
+        alert("Upload failed: " + (result.error || "Unknown error"));
+      }
+    } catch (error) {
+      console.error("Error uploading cake photo:", error);
+      alert("Error uploading cake photo. Check console.");
+    }
+    setUploadingCakePhoto(false);
   };
 
   const handleAudioUpload = async (e) => {
@@ -128,7 +159,7 @@ export default function AdminDashboard() {
         localStorage.setItem("localSurprises", JSON.stringify(updatedSurprises));
 
         alert("Surprise created successfully!");
-        setFormData({ slug: "", name: "", senderName: "", relationType: "Friend", celebrationType: "Party", letterContent: "", friendPhoto: "", customAudio: "", gallery: [] });
+        setFormData({ slug: "", name: "", senderName: "", relationType: "Friend", celebrationType: "Party", letterContent: "", friendPhoto: "", cakePhoto: "", customAudio: "", gallery: [] });
       } else {
         alert("Error saving data: " + result.error);
       }
@@ -312,6 +343,25 @@ export default function AdminDashboard() {
                 <div className="mt-2 flex items-center space-x-3 bg-green-500/10 border border-green-500/30 p-2 rounded">
                   <img src={formData.friendPhoto} alt="Uploaded" className="w-10 h-10 object-cover rounded-full border border-green-400" />
                   <p className="text-sm font-bold text-green-400">✅ Photo Submitted!</p>
+                </div>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-sm mb-1">Cake Topper Photo (Optional - Photo to stand on cake)</label>
+              <input 
+                type="file" 
+                accept="image/*"
+                onChange={handleCakePhotoUpload} 
+                disabled={uploadingCakePhoto || !formData.slug}
+                className="w-full bg-white/10 border border-white/20 rounded p-2 text-white text-sm" 
+              />
+              {!formData.slug && <p className="text-xs text-royal-pink mt-1">Please enter slug first to upload cake photo.</p>}
+              {uploadingCakePhoto && <p className="text-xs text-gold-accent mt-1 animate-pulse">Uploading cake photo...</p>}
+              {formData.cakePhoto && (
+                <div className="mt-2 flex items-center space-x-3 bg-green-500/10 border border-green-500/30 p-2 rounded">
+                  <img src={formData.cakePhoto} alt="Cake Topper" className="w-10 h-10 object-cover rounded-full border border-green-400" />
+                  <p className="text-sm font-bold text-green-400">✅ Cake Photo Attached!</p>
                 </div>
               )}
             </div>
