@@ -80,10 +80,11 @@ export default function SurprisePage() {
     
     const theme = getThemeConfig();
 
-    // Play Background Music
-    const audio = new Audio(theme.audioSrc);
+    // Play Background Music (Custom audio if uploaded, else default theme song)
+    const audioSource = data.customAudio || theme.audioSrc;
+    const audio = new Audio(audioSource);
     audio.loop = true;
-    audio.volume = 0.5;
+    audio.volume = 0.6;
     audio.play().catch(e => console.log("Audio autoplay blocked by browser:", e));
 
     (function frame() {

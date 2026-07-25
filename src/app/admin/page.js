@@ -11,11 +11,13 @@ export default function AdminDashboard() {
     celebrationType: "Party",
     letterContent: "",
     friendPhoto: "",
+    customAudio: "",
     gallery: []
   });
   const [loading, setLoading] = useState(false);
   const [uploadingImageId, setUploadingImageId] = useState(null);
   const [uploadingProfile, setUploadingProfile] = useState(false);
+  const [uploadingAudio, setUploadingAudio] = useState(false);
   const [deletingId, setDeletingId] = useState(null);
 
   useEffect(() => {
@@ -66,6 +68,35 @@ export default function AdminDashboard() {
     setUploadingProfile(false);
   };
 
+  const handleAudioUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    setUploadingAudio(true);
+    
+    const uploadData = new FormData();
+    uploadData.append("file", file);
+    uploadData.append("slug", formData.slug || "audio");
+
+    try {
+      const res = await fetch("/api/upload", {
+        method: "POST",
+        body: uploadData,
+      });
+      const result = await res.json();
+      if (result.url) {
+        setFormData({ ...formData, customAudio: result.url });
+        alert("Audio/Song uploaded!");
+      } else {
+        alert("Upload failed: " + (result.error || "Unknown error"));
+      }
+    } catch (error) {
+      console.error("Error uploading audio:", error);
+      alert("Error uploading audio. Check console.");
+    }
+    setUploadingAudio(false);
+  };
+
   const handleCreateSurprise = async (e) => {
     e.preventDefault();
     if (!formData.friendPhoto) {
@@ -96,7 +127,7 @@ export default function AdminDashboard() {
         localStorage.setItem("localSurprises", JSON.stringify(updatedSurprises));
 
         alert("Surprise created successfully!");
-        setFormData({ slug: "", name: "", senderName: "", relationType: "Friend", celebrationType: "Party", letterContent: "", friendPhoto: "", gallery: [] });
+        setFormData({ slug: "", name: "", senderName: "", relationType: "Friend", celebrationType: "Party", letterContent: "", friendPhoto: "", customAudio: "", gallery: [] });
       } else {
         alert("Error saving data: " + result.error);
       }
@@ -242,6 +273,25 @@ export default function AdminDashboard() {
                 <div className="mt-2 flex items-center space-x-3 bg-green-500/10 border border-green-500/30 p-2 rounded">
                   <img src={formData.friendPhoto} alt="Uploaded" className="w-10 h-10 object-cover rounded-full border border-green-400" />
                   <p className="text-sm font-bold text-green-400">✅ Photo Submitted!</p>
+                </div>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-sm mb-1">Custom Background Song / Voice Note (Optional - MP3, M4A, MP4)</label>
+              <input 
+                type="file" 
+                accept="audio/*,video/mp4,video/*"
+                onChange={handleAudioUpload} 
+                disabled={uploadingAudio || !formData.slug}
+                className="w-full bg-white/10 border border-white/20 rounded p-2 text-white text-sm" 
+              />
+              {!formData.slug && <p className="text-xs text-royal-pink mt-1">Please enter slug first to upload song/audio.</p>}
+              {uploadingAudio && <p className="text-xs text-gold-accent mt-1 animate-pulse">Uploading song/audio...</p>}
+              {formData.customAudio && (
+                <div className="mt-2 flex items-center space-x-3 bg-green-500/10 border border-green-500/30 p-2 rounded">
+                  <span className="text-xl">🎵</span>
+                  <p className="text-sm font-bold text-green-400 truncate max-w-[200px]">✅ Song/Audio Attached!</p>
                 </div>
               )}
             </div>

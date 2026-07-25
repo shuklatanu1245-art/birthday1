@@ -32,7 +32,7 @@ export async function POST(req) {
     // Upload to Cloudinary
     const result = await new Promise((resolve, reject) => {
       cloudinary.uploader.upload_stream(
-        { folder: `birthday_surprises/${slug}` },
+        { folder: `birthday_surprises/${slug}`, resource_type: "auto" },
         (error, result) => {
           if (error) reject(error);
           else resolve(result);
