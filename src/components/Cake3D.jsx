@@ -25,7 +25,7 @@ function Flame({ blown }) {
   if (blown) return null;
 
   return (
-    <group position={[0, 2.05, -0.4]}>
+    <group position={[0, 0, 0]}>
       {/* Outer Glow */}
       <mesh ref={flameRef} position={[0, 0, 0]}>
         <sphereGeometry args={[0.25, 16, 16]} />
@@ -59,7 +59,7 @@ function Smoke({ blown }) {
   if (!blown) return null;
 
   return (
-    <mesh ref={smokeRef} position={[0, 2.05, -0.4]}>
+    <mesh ref={smokeRef} position={[0, 0, 0]}>
       <sphereGeometry args={[0.2, 16, 16]} />
       <meshBasicMaterial color="#dddddd" transparent opacity={0.7} />
     </mesh>
@@ -67,86 +67,107 @@ function Smoke({ blown }) {
 }
 
 // Complete 3D Cake Model
-function CakeModel({ blown, themeColor = "#D12260", photoUrl }) {
+function CakeModel({ blown, photoUrl }) {
   return (
-    <group position={[0, -1.6, 0]}>
-      <Float speed={1.5} rotationIntensity={0.2} floatIntensity={0.2}>
-        {/* Cake Stand / Plate */}
-        <mesh position={[0, -0.7, 0]}>
-          <cylinderGeometry args={[2.5, 2.7, 0.15, 64]} />
-          <meshStandardMaterial color="#ffffff" metalness={0.8} roughness={0.1} />
+    <group position={[0, -0.8, 0]} scale={0.75}>
+      <Float speed={1.5} rotationIntensity={0.15} floatIntensity={0.2}>
+        
+        {/* Fancy Gold Cake Stand */}
+        <mesh position={[0, -0.7, 0]} castShadow>
+          <cylinderGeometry args={[2.8, 3.2, 0.15, 64]} />
+          <meshStandardMaterial color="#FFD700" metalness={0.9} roughness={0.1} />
         </mesh>
-        <mesh position={[0, -0.9, 0]}>
-          <cylinderGeometry args={[1.2, 1.5, 0.3, 32]} />
-          <meshStandardMaterial color="#dddddd" metalness={0.7} roughness={0.2} />
-        </mesh>
-
-        {/* Bottom Cake Layer */}
-        <mesh position={[0, -0.2, 0]} castShadow receiveShadow>
-          <cylinderGeometry args={[2, 2, 0.9, 64]} />
-          <meshStandardMaterial color={themeColor} roughness={0.3} metalness={0.1} />
+        <mesh position={[0, -1.1, 0]} castShadow>
+          <cylinderGeometry args={[1.5, 2.0, 0.6, 32]} />
+          <meshStandardMaterial color="#b8860b" metalness={0.8} roughness={0.2} />
         </mesh>
 
-        {/* Middle Icing Layer */}
-        <mesh position={[0, 0.28, 0]}>
-          <cylinderGeometry args={[2.02, 2.02, 0.1, 64]} />
-          <meshStandardMaterial color="#fffdd0" roughness={0.2} />
+        {/* Bottom Tier (Rich Dark Chocolate) */}
+        <mesh position={[0, -0.15, 0]} castShadow receiveShadow>
+          <cylinderGeometry args={[2.3, 2.3, 1.0, 64]} />
+          <meshStandardMaterial color="#3a1c0e" roughness={0.7} />
         </mesh>
 
-        {/* Top Cake Layer */}
-        <mesh position={[0, 0.65, 0]} castShadow receiveShadow>
-          <cylinderGeometry args={[1.5, 1.5, 0.7, 64]} />
-          <meshStandardMaterial color="#ff8899" roughness={0.3} />
+        {/* Cream Filling Layer */}
+        <mesh position={[0, 0.4, 0]}>
+          <cylinderGeometry args={[2.32, 2.32, 0.1, 64]} />
+          <meshStandardMaterial color="#fcebd5" roughness={0.3} />
         </mesh>
 
-        {/* Top Cream Drips / Frosting */}
-        <mesh position={[0, 1.02, 0]}>
-          <cylinderGeometry args={[1.52, 1.52, 0.08, 64]} />
-          <meshStandardMaterial color="#ffffff" roughness={0.1} />
+        {/* Top Tier (Milk Chocolate) */}
+        <mesh position={[0, 0.9, 0]} castShadow receiveShadow>
+          <cylinderGeometry args={[1.7, 1.7, 0.9, 64]} />
+          <meshStandardMaterial color="#4a2511" roughness={0.6} />
         </mesh>
 
-        {/* Decorative Cherries around top */}
-        {[...Array(8)].map((_, i) => {
-          const angle = (i / 8) * Math.PI * 2;
-          const x = Math.cos(angle) * 1.2;
-          const z = Math.sin(angle) * 1.2;
+        {/* Glossy Chocolate Ganache Drip (Top) */}
+        <mesh position={[0, 1.36, 0]}>
+          <cylinderGeometry args={[1.73, 1.73, 0.1, 64]} />
+          <meshStandardMaterial color="#2b1408" roughness={0.1} metalness={0.2} />
+        </mesh>
+
+        {/* Chocolate Truffles around Top Tier */}
+        {[...Array(12)].map((_, i) => {
+          const angle = (i / 12) * Math.PI * 2;
+          const x = Math.cos(angle) * 1.4;
+          const z = Math.sin(angle) * 1.4;
           return (
-            <mesh key={i} position={[x, 1.1, z]}>
-              <sphereGeometry args={[0.13, 16, 16]} />
-              <meshStandardMaterial color="#ff0033" roughness={0.1} metalness={0.3} />
+            <mesh key={`truffle-${i}`} position={[x, 1.45, z]} castShadow>
+              <sphereGeometry args={[0.18, 24, 24]} />
+              <meshStandardMaterial color="#1f0d05" roughness={0.2} metalness={0.1} />
             </mesh>
           );
         })}
 
-        {/* Standing Photo Frame Topper on the Cake */}
+        {/* Golden Flakes / Sprinkles around Bottom Tier */}
+        {[...Array(16)].map((_, i) => {
+          const angle = (i / 16) * Math.PI * 2;
+          const x = Math.cos(angle) * 2.0;
+          const z = Math.sin(angle) * 2.0;
+          return (
+            <mesh key={`flake-${i}`} position={[x, 0.5, z]} rotation={[Math.random(), Math.random(), 0]}>
+              <boxGeometry args={[0.15, 0.05, 0.05]} />
+              <meshStandardMaterial color="#FFD700" roughness={0.1} metalness={0.8} />
+            </mesh>
+          );
+        })}
+
+        {/* Standing Photo Frame Topper */}
         {photoUrl && (
-          <Html position={[0, 1.55, 0.3]} transform distanceFactor={5}>
-            <div className="w-24 h-24 md:w-28 md:h-28 rounded-full border-4 border-gold-accent shadow-[0_0_25px_rgba(255,215,0,0.9)] overflow-hidden bg-midnight-blue flex items-center justify-center pointer-events-none transform -translate-x-1/2 -translate-y-1/2">
+          <Html position={[0, 2.3, 0.4]} transform distanceFactor={5}>
+            <div className="w-28 h-28 md:w-32 md:h-32 rounded-full border-4 border-[#FFD700] shadow-[0_0_30px_rgba(255,215,0,0.8)] overflow-hidden bg-black flex items-center justify-center pointer-events-none transform -translate-x-1/2 -translate-y-1/2">
               <img src={photoUrl} alt="Cake Topper" className="w-full h-full object-cover" />
             </div>
           </Html>
         )}
 
-        {/* Thick, Highly Visible Candle (positioned slightly behind photo topper) */}
-        <mesh position={[0, 1.45, -0.4]}>
-          <cylinderGeometry args={[0.12, 0.12, 0.85, 32]} />
-          <meshStandardMaterial color="#ffffff" roughness={0.2} />
-        </mesh>
-        {/* Candle Wick */}
-        <mesh position={[0, 1.9, -0.4]}>
-          <cylinderGeometry args={[0.02, 0.02, 0.1, 16]} />
-          <meshBasicMaterial color="#111111" />
-        </mesh>
+        {/* Big Candle (placed slightly offset) */}
+        <group position={[0, 1.9, -0.6]}>
+          <mesh>
+            <cylinderGeometry args={[0.12, 0.12, 1.0, 32]} />
+            <meshStandardMaterial color="#ffffff" roughness={0.1} />
+          </mesh>
+          {/* Candle Spiral Stripe */}
+          <mesh>
+            <cylinderGeometry args={[0.13, 0.13, 0.9, 16]} />
+            <meshStandardMaterial color="#d4af37" wireframe />
+          </mesh>
+          {/* Wick */}
+          <mesh position={[0, 0.52, 0]}>
+            <cylinderGeometry args={[0.02, 0.02, 0.1, 16]} />
+            <meshBasicMaterial color="#222" />
+          </mesh>
+          {/* Flame & Smoke attached to candle's local position! */}
+          <group position={[0, 0.65, 0]}>
+            <Flame blown={blown} />
+            <Smoke blown={blown} />
+          </group>
+        </group>
 
-        {/* Animated Flame */}
-        <Flame blown={blown} />
-        <Smoke blown={blown} />
-
-        {/* Sparkles around cake */}
-        <Sparkles count={50} scale={5} size={4} speed={0.5} opacity={0.8} color="#FFD700" />
+        <Sparkles count={80} scale={6} size={4} speed={0.5} opacity={0.8} color="#FFD700" />
       </Float>
 
-      <ContactShadows position={[0, -1.8, 0]} opacity={0.7} scale={12} blur={2.5} far={5} />
+      <ContactShadows position={[0, -2.5, 0]} opacity={0.7} scale={15} blur={2.5} far={6} />
     </group>
   );
 }
@@ -262,19 +283,19 @@ export default function Cake3D({ themeColor = "#D12260", photoUrl, letterContent
 
       {/* 3D Canvas Container - Perfectly centered camera and target */}
       <div className="w-full h-[500px] md:h-[580px] relative rounded-3xl overflow-hidden glassmorphism border-2 border-gold-accent/40 shadow-2xl bg-gradient-to-b from-white/10 via-black/50 to-black/80 mb-8 cursor-grab active:cursor-grabbing">
-        <Canvas camera={{ position: [0, -0.3, 8.5], fov: 46 }}>
+        <Canvas camera={{ position: [0, 0.5, 8.0], fov: 45 }}>
           <ambientLight intensity={1.2} />
           <directionalLight position={[10, 10, 5]} intensity={2.0} castShadow />
           <pointLight position={[0, 5, 0]} intensity={1.5} color="#ffffff" />
           
-          <CakeModel blown={blown} themeColor={themeColor} photoUrl={photoUrl} />
+          <CakeModel blown={blown} photoUrl={photoUrl} />
           
           <OrbitControls 
-            target={[0, -0.9, 0]}
+            target={[0, 0, 0]}
             enablePan={false} 
-            minDistance={5} 
+            minDistance={4} 
             maxDistance={9} 
-            maxPolarAngle={Math.PI / 2 + 0.05}
+            maxPolarAngle={Math.PI / 2 + 0.1}
             minPolarAngle={Math.PI / 6}
           />
         </Canvas>
