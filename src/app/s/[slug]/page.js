@@ -82,12 +82,12 @@ export default function SurprisePage() {
     
     const theme = getThemeConfig();
 
-    // Play Background Music (Custom audio if uploaded, else default theme song)
-    const audioSource = data.customAudio || theme.audioSrc;
-    const audio = new Audio(audioSource);
-    audio.loop = true;
-    audio.volume = 0.6;
-    audio.play().catch(e => console.log("Audio autoplay blocked by browser:", e));
+    // Play Background Music
+    const audioEl = document.getElementById("bg-music");
+    if (audioEl) {
+      audioEl.volume = 0.6;
+      audioEl.play().catch(e => console.log("Audio autoplay blocked by browser:", e));
+    }
 
     (function frame() {
       confetti({
@@ -130,6 +130,9 @@ export default function SurprisePage() {
 
   return (
     <main className={`relative min-h-screen flex flex-col items-center justify-center overflow-hidden ${theme.bgClass}`}>
+      {/* Background Music Player */}
+      <audio id="bg-music" src={data.customAudio || theme.audioSrc} loop playsInline />
+
       <AnimatePresence>
         {!isOpen && (
           <motion.div 
