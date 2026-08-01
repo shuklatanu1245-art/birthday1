@@ -348,7 +348,7 @@ export default function AdminDashboard() {
             </div>
 
             <div>
-              <label className="block text-sm mb-1">Cake Topper Photo (Optional - Photo to stand on cake)</label>
+              <label className="block text-sm mb-1">Upload Cake Image (Required - 2D Photo of the Cake)</label>
               <input 
                 type="file" 
                 accept="image/*"
@@ -361,7 +361,7 @@ export default function AdminDashboard() {
               {formData.cakePhoto && (
                 <div className="mt-2 flex items-center space-x-3 bg-green-500/10 border border-green-500/30 p-2 rounded">
                   <img src={formData.cakePhoto} alt="Cake Topper" className="w-10 h-10 object-cover rounded-full border border-green-400" />
-                  <p className="text-sm font-bold text-green-400">✅ Cake Photo Attached!</p>
+                  <p className="text-sm font-bold text-green-400">✅ Cake Image Attached!</p>
                 </div>
               )}
             </div>
