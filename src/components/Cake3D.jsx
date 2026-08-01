@@ -151,7 +151,7 @@ function CakeModel({ blown, themeColor = "#D12260", photoUrl }) {
   );
 }
 
-export default function Cake3D({ themeColor = "#D12260", photoUrl }) {
+export default function Cake3D({ themeColor = "#D12260", photoUrl, letterContent, name, senderName, relationType }) {
   const [blown, setBlown] = useState(false);
   const [micActive, setMicActive] = useState(false);
   const [micError, setMicError] = useState("");
@@ -315,9 +315,19 @@ export default function Cake3D({ themeColor = "#D12260", photoUrl }) {
               <h3 className="text-3xl font-serif font-bold text-gold-accent animate-bounce mb-2">
                 🎉 Wish Granted! 🎂
               </h3>
-              <p className="text-white text-base font-sans font-medium">
-                May all your dreams, happiness, and desires come true this year! ✨
-              </p>
+              <div className="text-white text-lg font-sans whitespace-pre-wrap leading-relaxed text-left w-full mt-6 pt-6 border-t border-white/20">
+                {name && <h2 className="text-3xl font-serif text-gold-accent mb-4">Dear {name},</h2>}
+                {letterContent}
+                
+                <div className="mt-8 text-royal-pink italic font-serif text-right w-full">
+                  <p className="text-xl">With lots of love,</p>
+                  {senderName ? (
+                    <p className="text-2xl font-bold">{senderName}</p>
+                  ) : (
+                    <p className="text-xl">Your {relationType === "Girlfriend" ? "Boyfriend" : "Friend"}</p>
+                  )}
+                </div>
+              </div>
             </div>
 
             <motion.button
