@@ -3,7 +3,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import confetti from "canvas-confetti";
 
-export default function Cake3D({ themeColor = "#D12260", photoUrl, letterContent, name, senderName, relationType }) {
+export default function Cake3D({ themeColor = "#D12260", photoUrl, friendPhoto, letterContent, name, senderName, relationType }) {
   const [blown, setBlown] = useState(false);
   const [micActive, setMicActive] = useState(false);
   const [micError, setMicError] = useState("");
@@ -190,7 +190,10 @@ export default function Cake3D({ themeColor = "#D12260", photoUrl, letterContent
                 🎉 Wish Granted! 🎂
               </h3>
               <div className="text-white text-lg font-sans whitespace-pre-wrap break-words break-all leading-relaxed text-left w-full mt-6 pt-6 border-t border-white/20">
-                {name && <h2 className="text-3xl font-serif text-gold-accent mb-4">Dear {name},</h2>}
+                <div className="flex items-center space-x-4 mb-4">
+                  {friendPhoto && <img src={friendPhoto} alt={name} className="w-16 h-16 rounded-full border-2 border-gold-accent object-cover shadow-lg" />}
+                  {name && <h2 className="text-3xl font-serif text-gold-accent">Dear {name},</h2>}
+                </div>
                 {letterContent}
                 
                 <div className="mt-8 text-royal-pink italic font-serif text-right w-full">

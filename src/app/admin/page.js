@@ -240,11 +240,41 @@ export default function AdminDashboard() {
       const newSurprises = surprises.map(s => s.id === surpriseId ? targetSurprise : s);
       setSurprises(newSurprises);
       localStorage.setItem("localSurprises", JSON.stringify(newSurprises));
-      setTimelineInput({ ...timelineInput, [surpriseId]: { year: "", title: "", description: "", emoji: "" } });
+      setTimelineInput({ ...timelineInput, [surpriseId]: { year: "", title: "", description: "", emoji: "", photo: "" } });
       alert("Timeline milestone added successfully!");
     } catch (error) {
       console.error("Error adding timeline item:", error);
       alert("Failed to save timeline item.");
+    }
+  };
+
+  const handleTimelinePhotoUpload = async (e, surpriseId, slug) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    // Optional: could add uploading state here, but relying on alert for simplicity
+    const uploadData = new FormData();
+    uploadData.append("file", file);
+    uploadData.append("slug", slug + "_timeline");
+
+    try {
+      const res = await fetch("/api/upload", {
+        method: "POST",
+        body: uploadData,
+      });
+      const result = await res.json();
+      if (result.url) {
+        setTimelineInput(prev => ({
+          ...prev,
+          [surpriseId]: { ...(prev[surpriseId] || {}), photo: result.url }
+        }));
+        alert("Memory photo uploaded! Now click Add to save the milestone.");
+      } else {
+        alert("Upload failed.");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Error uploading memory photo.");
     }
   };
 
@@ -517,7 +547,17 @@ export default function AdminDashboard() {
                         Add
                       </button>
                     </div>
-                    <p className="text-[10px] text-gray-400">Current custom milestones: {s.timeline?.length || 0} (Default chapters shown if 0)</p>
+                    <div className="flex items-center space-x-2 mt-1">
+                      <label className="text-[10px] text-gray-400">Memory Photo (Optional):</label>
+                      <input 
+                        type="file" 
+                        accept="image/*"
+                        onChange={(e) => handleTimelinePhotoUpload(e, s.id, s.slug)}
+                        className="text-[10px] file:py-1 file:px-2 file:rounded file:border-0 file:bg-royal-pink file:text-white"
+                      />
+                      {timelineInput[s.id]?.photo && <span className="text-[10px] text-green-400">✅ Uploaded</span>}
+                    </div>
+                    <p className="text-[10px] text-gray-400 mt-1">Current custom milestones: {s.timeline?.length || 0} (Default chapters shown if 0)</p>
                   </div>
                 </li>
               ))}

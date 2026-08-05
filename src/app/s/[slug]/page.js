@@ -178,6 +178,7 @@ export default function SurprisePage() {
             <Cake3D 
               themeColor={theme.colors?.[0] || "#D12260"} 
               photoUrl={data.cakePhoto || data.friendPhoto} 
+              friendPhoto={data.friendPhoto}
               letterContent={data.letterContent}
               name={data.name}
               senderName={data.senderName}
