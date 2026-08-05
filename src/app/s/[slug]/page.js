@@ -172,7 +172,7 @@ export default function SurprisePage() {
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5, duration: 1 }}
-            className="absolute inset-0 flex flex-col items-center justify-center bg-midnight-blue/90 z-20 p-8 overflow-y-auto"
+            className="absolute inset-0 flex flex-col items-center justify-start bg-midnight-blue/90 z-20 p-8 pt-20 overflow-y-auto"
           >
             {/* Interactive 3D Cake Section */}
             <Cake3D 

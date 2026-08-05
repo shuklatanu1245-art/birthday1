@@ -189,7 +189,7 @@ export default function Cake3D({ themeColor = "#D12260", photoUrl, letterContent
               <h3 className="text-3xl font-serif font-bold text-gold-accent animate-bounce mb-2">
                 🎉 Wish Granted! 🎂
               </h3>
-              <div className="text-white text-lg font-sans whitespace-pre-wrap leading-relaxed text-left w-full mt-6 pt-6 border-t border-white/20">
+              <div className="text-white text-lg font-sans whitespace-pre-wrap break-words break-all leading-relaxed text-left w-full mt-6 pt-6 border-t border-white/20">
                 {name && <h2 className="text-3xl font-serif text-gold-accent mb-4">Dear {name},</h2>}
                 {letterContent}
                 
