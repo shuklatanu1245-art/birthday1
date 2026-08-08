@@ -209,9 +209,10 @@ export default function SurprisePage() {
             <p className="mt-8 text-gray-400 text-sm animate-pulse">More surprises coming soon!</p>
             
             {/* Developer Credit */}
-            <div className="mt-16 pb-8 text-center text-gray-500/80 text-xs font-sans flex flex-col items-center">
+            <div className="mt-16 pb-8 text-center text-gray-500/80 text-xs font-sans flex flex-col items-center space-y-1">
               <span>Made with ❤️</span>
-              <span className="font-bold tracking-wider mt-1">Developer: Dev Shukla</span>
+              <span className="font-bold tracking-wider">Developer: Dev Shukla</span>
+              <span className="font-bold tracking-wider text-gray-400">Secondary Developer: Suraj Sharma</span>
             </div>
           </motion.div>
         )}
