@@ -565,6 +565,12 @@ export default function AdminDashboard() {
           )}
         </div>
       </div>
+
+      {/* Developer Credit */}
+      <div className="mt-12 text-center text-gray-500/80 text-xs font-sans flex flex-col items-center">
+        <span>Crafted with ❤️</span>
+        <span className="font-bold tracking-wider mt-1">Developer: Dev Shukla</span>
+      </div>
     </div>
   );
 }
